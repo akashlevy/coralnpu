@@ -60,8 +60,7 @@ def rename_duplicate_sram_modules(input_file, output_file):
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print("Usage: python3 remove_duplicate_sram_modules.py <input_file> <output_file>")
-        print("Example: python3 remove_duplicate_sram_modules.py RvvCoreMiniVerificationAxi.sv RvvCoreMiniVerificationAxi_fixed.sv")
+        print("Usage: python3 rename_duplicate_sram_modules.py <input_file> <output_file>")
         sys.exit(1)
     
     input_file = sys.argv[1]

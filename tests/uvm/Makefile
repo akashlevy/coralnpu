@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Makefile for CoralNPU UVM Testbench (Using DSim simulator)
+# Makefile for CoralNPU UVM Testbench
 
 # Check if CORALNPU_MPACT is set. If not, exit with an error.
 # ifndef CORALNPU_MPACT
@@ -57,7 +57,6 @@ FILE_LIST = ./coralnpu_dv.f
 DSIM_WORK = dsim_work
 DSIM_IMAGE = image
 UVM_TESTNAME ?= coralnpu_base_test
-# TEST_ELF ?= $(BIN_DIR)/coralnpu_v2_program.elf
 TEST_ELF ?= $(BIN_DIR)/riscv_rand_instr_test_0.elf
 UVM_VERBOSITY ?= UVM_HIGH
 TEST_TIMEOUT_NS ?= 100000
@@ -123,7 +122,7 @@ rtl:
 	bazel build //hdl/chisel/src/coralnpu:rvv_core_mini_verification_axi_cc_library_emit_verilog
 	@echo "--- Fixing Chisel-generated code for DSim compatibility ---"
 	sed -i 's/:\/\/\(.*\)/: \/\/\1/g' $(GENERATED_RTL_SRC)
-	@echo "--- Removing duplicate SRAM module definitions ---"
+	@echo "--- Renaming duplicate SRAM module definitions ---"
 	python3 $(UTILS_DIR)/rename_duplicate_sram_modules.py $(GENERATED_RTL_SRC) $(GENERATED_RTL_SRC).tmp
 	mv $(GENERATED_RTL_SRC).tmp $(GENERATED_RTL_SRC)
 

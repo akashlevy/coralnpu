@@ -215,20 +215,6 @@ module coralnpu_tb_top;
   end
 
   //--------------------------------------------------------------------------
-  // Waveform Dumping
-  //--------------------------------------------------------------------------
-  `ifdef DUMP_WAVES
-  initial begin
-    $dumpfile($sformatf("./sim_work/waves/%s.vcd", "coralnpu_base_test"));
-    $dumpvars(0, coralnpu_tb_top);
-    `uvm_info("TB_TOP",
-              $sformatf("VCD Waveform Dumping Enabled to: %s",
-              $sformatf("./sim_work/waves/%s.vcd", "coralnpu_base_test")),
-              UVM_LOW);
-  end
-  `endif
-
-  //--------------------------------------------------------------------------
   // ELF Memory Loading and `tohost` Monitor
   //--------------------------------------------------------------------------
   initial begin

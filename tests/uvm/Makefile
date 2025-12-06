@@ -42,7 +42,12 @@ UTILS_DIR = ./utils
 # Simulation Work Directory
 SIM_DIR = ./sim_work
 LOG_DIR = $(SIM_DIR)/logs
+
+# Waveform Dumping
 WAVE_DIR = $(SIM_DIR)/waves
+WAVE_FILE = $(WAVE_DIR)/$(UVM_TESTNAME).vcd
+DUMP_WAVES = 1
+
 MEM_FILE_DIR = $(SIM_DIR)/mem_files
 RUN_OPTS_FILE = $(MEM_FILE_DIR)/elf_run_opts.f
 
@@ -62,12 +67,7 @@ UVM_VERBOSITY ?= UVM_HIGH
 TEST_TIMEOUT_NS ?= 100000
 PLUSARGS = +UVM_TESTNAME=$(UVM_TESTNAME) \
            +UVM_VERBOSITY=$(UVM_VERBOSITY) +TEST_TIMEOUT=$(TEST_TIMEOUT_NS) \
-           +TEST_ELF=$(TEST_ELF) \
-					 +acc+b -waves $(SIM_DIR)/waves/waves.vcd
-
-# Waveform Dumping
-DUMP_WAVES = 1
-WAVE_FILE = $(WAVE_DIR)/$(UVM_TESTNAME).vcd
+           +TEST_ELF=$(TEST_ELF)
 
 # DSim Compilation Options
 # Note: UVM_HOME and DSIM_HOME are set in the Docker environment
@@ -80,9 +80,8 @@ DSIM_COMPILE_OPTS = \
 	-timescale 1ns/1ps \
 	-sv_lib ${UVM_HOME}/src/dpi/libuvm_dpi.so \
 	-uvm default \
-	-noopt \
-	+acc+b -waves $(SIM_DIR)/waves/waves.vcd
-
+	-noopt
+	
 DSIM_RUN_OPTS = \
 	$(PLUSARGS) \
 	-f $(RUN_OPTS_FILE) \
@@ -90,11 +89,11 @@ DSIM_RUN_OPTS = \
 
 # Add define to COMPILE options for waveform dumping
 ifeq ($(DUMP_WAVES),1)
-DSIM_COMPILE_OPTS += +define+DUMP_WAVES
+DSIM_COMPILE_OPTS += +acc+b -waves $(WAVE_FILE)
+DSIM_RUN_OPTS += -waves $(WAVE_FILE)
 endif
 
 # Targets
-
 .PHONY: all compile run clean dirs help build_mpact_lib gen_mem_files rtl
 
 # Default target, builds and then runs.

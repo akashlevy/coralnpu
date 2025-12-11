@@ -38,7 +38,7 @@ SIM_DIR = ./sim_work
 LOG_DIR = $(SIM_DIR)/logs
 
 # Waveform Dumping
-DUMP_WAVES = 0
+DUMP_WAVES ?= 0
 WAVE_DIR = $(SIM_DIR)/waves
 WAVE_FILE = $(WAVE_DIR)/$(UVM_TESTNAME).vcd
 
@@ -59,7 +59,7 @@ DSIM_WORK = dsim_work
 DSIM_IMAGE = image
 UVM_TESTNAME ?= coralnpu_base_test
 TEST_ELF ?= $(BIN_DIR)/coralnpu_v2_program.elf
-LOG_FILENAME = test
+LOG_FILENAME ?= test
 UVM_VERBOSITY ?= UVM_HIGH
 TEST_TIMEOUT_NS ?= 100000
 PLUSARGS = +UVM_TESTNAME=$(UVM_TESTNAME) \

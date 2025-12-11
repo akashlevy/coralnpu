@@ -176,9 +176,8 @@ package coralnpu_test_pkg;
 
       env = coralnpu_env::type_id::create("env", this);
 
-      // DISABLED: MPACT co-simulation not available
-      // uvm_config_db#(string)::set(this, "*.m_cosim_checker",
-      //                             "elf_file_for_iss", test_elf);
+      uvm_config_db#(string)::set(this, "*.m_cosim_checker",
+                                  "elf_file_for_iss", test_elf);
 
       // Get the event handle that was created and set by tb_top
       if (!uvm_config_db#(uvm_event)::get(this, "",

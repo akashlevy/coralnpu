@@ -14,13 +14,15 @@
 
 # Makefile for CoralNPU UVM Testbench
 
-# Check if CORALNPU_MPACT is set. If not, exit with an error.
-# ifndef CORALNPU_MPACT
-#     $(error CORALNPU_MPACT is not set. Please define it, e.g., export CORALNPU_MPACT=$(abspath ../../../coralnpu-mpact))
-# endif
 
 # Workspace root (two levels up from tests/uvm/)
 WORKSPACE_ROOT := $(shell cd ../.. && pwd)
+
+# Check if CORALNPU_MPACT is set. If not, exit with an error.
+CORALNPU_MPACT = $(shell cd ../../../coralnpu-mpact && pwd)
+ifndef CORALNPU_MPACT
+    $(error CORALNPU_MPACT is not set. Please define it, e.g., export CORALNPU_MPACT=$(abspath ../../../coralnpu-mpact))
+endif
 
 # Generated RTL path
 BAZEL_BIN_DIR = $(shell cd $(WORKSPACE_ROOT) && bazel info bazel-bin)
@@ -46,7 +48,7 @@ LOG_DIR = $(SIM_DIR)/logs
 # Waveform Dumping
 WAVE_DIR = $(SIM_DIR)/waves
 WAVE_FILE = $(WAVE_DIR)/$(UVM_TESTNAME).vcd
-DUMP_WAVES = 1
+DUMP_WAVES = 0
 
 MEM_FILE_DIR = $(SIM_DIR)/mem_files
 RUN_OPTS_FILE = $(MEM_FILE_DIR)/elf_run_opts.f
@@ -63,6 +65,7 @@ DSIM_WORK = dsim_work
 DSIM_IMAGE = image
 UVM_TESTNAME ?= coralnpu_base_test
 TEST_ELF ?= $(BIN_DIR)/riscv_rand_instr_test_0.elf
+LOG_FILENAME = test
 UVM_VERBOSITY ?= UVM_HIGH
 TEST_TIMEOUT_NS ?= 100000
 PLUSARGS = +UVM_TESTNAME=$(UVM_TESTNAME) \
@@ -80,16 +83,21 @@ DSIM_COMPILE_OPTS = \
 	-timescale 1ns/1ps \
 	-sv_lib ${UVM_HOME}/src/dpi/libuvm_dpi.so \
 	-uvm default \
-	-noopt
+	-noopt \
+	+acc+b -waves $(WAVE_FILE) \
+	-c-opts "-I$(CORALNPU_MPACT) -std=c++17" \
+  -ld-opts "-L$(MPACT_BAZEL_BIN_DIR) -l$(MPACT_COSIM_LIB_NAME)"
 	
 DSIM_RUN_OPTS = \
 	$(PLUSARGS) \
 	-f $(RUN_OPTS_FILE) \
-	-sv_lib ${UVM_HOME}/src/dpi/libuvm_dpi.so
+	-sv_lib ${UVM_HOME}/src/dpi/libuvm_dpi.so \
+	-y $(MPACT_BAZEL_BIN_DIR) \
+	-v $(MPACT_COSIM_LIB_NAME) \
+	+incdir+dir[+$(CORALNPU_MPACT)]
 
 # Add define to COMPILE options for waveform dumping
 ifeq ($(DUMP_WAVES),1)
-DSIM_COMPILE_OPTS += +acc+b -waves $(WAVE_FILE)
 DSIM_RUN_OPTS += -waves $(WAVE_FILE)
 endif
 
@@ -123,10 +131,11 @@ rtl:
 	sed -i 's/:\/\/\(.*\)/: \/\/\1/g' $(GENERATED_RTL_SRC)
 	@echo "--- Renaming duplicate SRAM module definitions ---"
 	python3 $(UTILS_DIR)/rename_duplicate_sram_modules.py $(GENERATED_RTL_SRC) $(GENERATED_RTL_SRC).tmp
+	rm -f $(GENERATED_RTL_SRC)
 	mv $(GENERATED_RTL_SRC).tmp $(GENERATED_RTL_SRC)
 
 # Compile the design (removed build_mpact_lib dependency since CORALNPU_MPACT is not set)
-compile: $(FILE_LIST) dirs rtl
+compile: $(FILE_LIST) dirs rtl build_mpact_lib
 	@echo "--- Compiling with dsim ---"
 	$(DSIM) $(DSIM_COMPILE_OPTS) -l $(LOG_DIR)/compile.log -work $(DSIM_WORK) -genimage $(DSIM_IMAGE) -f $(FILE_LIST) $(GENERATED_RTL_SRC)
 	@echo "--- Compilation Finished ---"
@@ -139,11 +148,11 @@ run: gen_mem_files
 	@echo "Verbosity: $(UVM_VERBOSITY)"
 	@echo "Timeout:   $(TEST_TIMEOUT_NS) ns"
 	@echo "Plusargs:  $(PLUSARGS)"
-	@echo "Log File:  $(LOG_DIR)/$(UVM_TESTNAME).log"
+	@echo "Log File:  $(LOG_DIR)/$(LOG_FILENAME).log"
 ifeq ($(DUMP_WAVES),1)
 	@echo "Wave File: $(WAVE_FILE)"
 endif
-	$(DSIM) -work $(DSIM_WORK) -image $(DSIM_IMAGE) $(DSIM_RUN_OPTS) -l $(LOG_DIR)/$(UVM_TESTNAME).log
+	$(DSIM) -work $(DSIM_WORK) -image $(DSIM_IMAGE) $(DSIM_RUN_OPTS) -l $(LOG_DIR)/$(LOG_FILENAME).log
 	@echo "--- Simulation Finished ---"
 
 # Clean up simulation files

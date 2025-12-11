@@ -40,7 +40,7 @@ package coralnpu_env_pkg;
     coralnpu_irq_agent        m_irq_agent;    // Drives IRQ/Control Signals
     coralnpu_rvvi_agent       m_rvvi_agent;   // Passive agent for RVVI
     coralnpu_cosim_checker    m_cosim_checker; // Manages co-simulation against MPACT simulator
-    
+
     // Constructor
     function new(string name = "coralnpu_env", uvm_component parent = null);
       super.new(name, parent);

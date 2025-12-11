@@ -29,8 +29,8 @@ module coralnpu_tb_top;
   import coralnpu_axi_master_agent_pkg::*;
   import coralnpu_axi_slave_agent_pkg::*;
   import coralnpu_irq_agent_pkg::*;
-  // import coralnpu_rvvi_agent_pkg::*;  // DISABLED: Depends on co-simulation infrastructure
-  // import coralnpu_cosim_checker_pkg::*;  // DISABLED: MPACT co-simulation not available
+  import coralnpu_rvvi_agent_pkg::*;
+  import coralnpu_cosim_checker_pkg::*;
 
   //--------------------------------------------------------------------------
   // Parameters
@@ -296,14 +296,12 @@ module coralnpu_tb_top;
     uvm_config_db#(virtual coralnpu_irq_if.DUT_IRQ_PORT)::set(null,
         "*", "irq_vif", irq_if);
 
-    // DISABLED: MPACT co-simulation not available
-    // uvm_config_db#(virtual rvviTrace #(.ILEN(32), .XLEN(32), .FLEN(32),
-    //     .VLEN(128), .NHART(1), .RETIRE(8)))::set(null,
-    //     "*.env.m_cosim_checker*", "rvvi_vif", rvvi_vif);
-    // DISABLED: RVVI agent depends on co-simulation infrastructure
-    // uvm_config_db#(virtual rvviTrace #(.ILEN(32), .XLEN(32), .FLEN(32),
-    //     .VLEN(128), .NHART(1), .RETIRE(8)))::set(null,
-    //     "*.env.m_rvvi_agent*", "rvvi_vif", rvvi_vif);
+    uvm_config_db#(virtual rvviTrace #(.ILEN(32), .XLEN(32), .FLEN(32),
+        .VLEN(128), .NHART(1), .RETIRE(8)))::set(null,
+        "*.env.m_cosim_checker*", "rvvi_vif", rvvi_vif);
+    uvm_config_db#(virtual rvviTrace #(.ILEN(32), .XLEN(32), .FLEN(32),
+        .VLEN(128), .NHART(1), .RETIRE(8)))::set(null,
+        "*.env.m_rvvi_agent*", "rvvi_vif", rvvi_vif);
 
     uvm_config_db#(time)::set(null, "*", "clk_period", CLK_PERIOD);
 

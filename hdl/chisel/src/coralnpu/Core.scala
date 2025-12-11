@@ -145,7 +145,7 @@ object EmitCore extends App {
 
   val firtoolOpts = Array(
       // Disable `automatic logic =`, Suppress location comments
-      "--lowering-options=disallowLocalVariables,locationInfoStyle=none",
+      "--lowering-options=disallowLocalVariables,locationInfoStyle=wrapInAtSquareBracket",
       "-enable-layers=Verification",
   )
   val systemVerilogSource = ChiselStage.emitSystemVerilog(

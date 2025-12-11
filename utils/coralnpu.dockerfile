@@ -24,7 +24,9 @@ RUN ln -snf "/usr/share/zoneinfo/${TZ}" /etc/localtime && \
         build-essential \
         ca-certificates \
         ccache \
+        clang \
         curl \
+        default-jdk \
         fuse3 \
         gawk \
         git \

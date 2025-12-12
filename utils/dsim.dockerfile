@@ -47,9 +47,7 @@ ENV LD_LIBRARY_PATH=${DSIM_HOME}/lib:${LLVM_HOME}/lib
 # Symlink libuvm_dpi.so to dsim lib path
 RUN ln -s ${UVM_HOME}/src/dpi/libuvm_dpi.so ${DSIM_LIB_PATH}/libuvm_dpi.so
 
-# # Replace dsim binary
-# COPY dsim /root/AltairDSim/2025/bin/dsim
-# RUN chmod +x /root/AltairDSim/2025/bin/dsim
+# Add license file
 COPY dsim-license.json /root/dsim-license.json
 
 # Command to run when container starts

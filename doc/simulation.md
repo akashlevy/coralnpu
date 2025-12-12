@@ -1,5 +1,7 @@
 # Simulation
 
+CoralNPU supports using either VCS simulator or DSim.
+
 ## VCS Support
 
 CoralNPU supports using VCS simulator. To enable VCS support, the following
@@ -33,3 +35,38 @@ vcs_testbench_test(
 
 By default, we disable VCS within bazel. Invoke
 `bazel {build,run,test} --config=vcs` to enable VCS support.
+
+## DSim Support
+
+CoralNPU supports using DSim in Docker.
+
+### Prerequisites
+
+1. Ensure that Docker is installed and available for use.
+2. Download the DSim binary (`AltairDSim2025.0.1_linux64.bin`) into `utils/`.
+3. Place your DSim license JSON file (`dsim-license.json`) into `utils/`.
+4. Clone `coralnpu-mpact` into the same path as this repo.
+
+## Build images
+
+```
+docker build --platform linux/amd64 -f utils/dsim.dockerfile
+docker build --platform linux/amd64 -f utils/coralnpu-dsim.dockerfile coralnpu-dsim
+dockerfile -t coralnpu-dsim
+```
+
+### Launch container
+
+```
+docker run -it --platform linux/amd64 -v $(pwd):/workspace -w /workspace coralnpu-dsim
+```
+
+### Run a test with an ELF file
+
+1. Copy your ELF into `tests/uvm/bin`
+2. `make run TEST_ELF=./bin/<test>.elf`
+
+### Outputs
+
+- Logs: `sim_work/logs/`
+- Waves: `sim_work/waves/`
